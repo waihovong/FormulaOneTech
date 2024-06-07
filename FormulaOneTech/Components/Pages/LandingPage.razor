@@ -1,6 +1,6 @@
 ﻿@inject FormulaOneTech.Services.Ergast.IErgastService _ergastService;
 @using Models.Ergast;
-<h3>Formula 1 Technical</h3>
+<h3 class="text-[#E4EDF5] text-xl font-bold italic">Formula 1 Technical</h3>
 
 @if(isLoading)
 {
@@ -8,14 +8,7 @@
 }
 else
 {
-    if (Drivers != null)
-    {
-        foreach(var driver in Drivers)
-        {
-            <p><span class="text-lg text-purple-500">@driver.Position</span>@driver.Driver.GivenName <span>@driver.Points</span></p>
-            <p>@driver.Constructors.FirstOrDefault()?.Name</p>
-        }
-    }
+    <FormulaOneTech.Components.Drivers.DriverStandings/>
 }
 
 
@@ -26,13 +19,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Drivers = await GetCurrentDriverStandings();
         isLoading = false;
-    }
-
-    private async Task<List<Models.Ergast.DriverStandings>> GetCurrentDriverStandings()
-    {
-        var drivers = await _ergastService.GetCurrentDriverStandings();
-        return drivers;
     }
 }
