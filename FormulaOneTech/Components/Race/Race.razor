@@ -3,62 +3,71 @@
 @using FormulaOneTech.Helpers;
 
 <div class="text-[#E4EDF5]">
-    @if(isLoading)
+    @if (isLoading)
     {
         <div>Loading...</div>
     }
     else
     {
 
-        <div class="bg-opacity-60 no-scrollbar overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter">
-            <div>@NextRace.RaceName</div>
-            <div>@NextRace.Circuit.CircuitName</div>
-            <div>@NextRace.Circuit.Location.Locality, @NextRace.Circuit.Location.Country</div>
-            <div>@NextRace.SessionTime.Value.ToString("MMMM dd ddd HH:mm")</div>
-        </div>
-        <div class="bg-red-300">
-            <div>
-                Practice 1 
-            </div>
-            <div>
-                @NextRace.FirstPractice.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
-            </div>
-        </div>
-        <div class="bg-yellow-300">
-            <div>
-                Practice 2
-            </div>
-            <div>
-                @NextRace.SecondPractice.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
-            </div>
-        </div>
-        <div class="bg-yellow-300">
-            <div>
-                Practice 3
-            </div>
-            <div>
-                @NextRace.ThirdPractice.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
-            </div>
-        </div>
-        <div class="bg-yellow-300">
-            <div>
-                Qualifying
-            </div>
-            <div>
-                @NextRace.Qualifying.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
-            </div>
-        </div>
-        @if (NextRace.Sprint != null)
-        {
-            <div class="bg-yellow-300">
-                <div>
-                    Sprint Race
+        <div class="no-scrollbar border-8 bg-opacity-60 border-r-0 border-b-0 border-l-0 overflow-y-auto rounded-lg border-red-700 border-t-red-700 bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter">
+            <div class="grid gap-2 @(NextRace.Sprint != null ? "grid-cols-4" : "grid-cols-3")">
+                <div class="">
+                    <span class="font-bold uppercase text-red-600">Round @NextRace.Round - Upcoming</span>                    <div class="text-xl font-extrabold uppercase">@NextRace.RaceName</div>
+                    <div class="font-bold">
+                        <span>@NextRace.Circuit.CircuitName</span> <span class="font-bold">-</span>
+                        <span class="font-medium">@NextRace.Circuit.Location.Locality, @NextRace.Circuit.Location.Country</span>
+                    </div>
+
+                    <div class="font-medium">@NextRace.SessionTime.Value.ToString("MMMM dd ddd HH:mm")</div>
                 </div>
-                <div>
-                    @NextRace.Sprint.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
+                <div class="flex w-fit items-center justify-center font-medium">
+                    <div class="">
+                        Qualifying
+                    </div>
+                    <div>
+                        @NextRace.Qualifying.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
+                    </div>
+                </div>
+                @if (NextRace.Sprint != null)
+                {
+                    <div class="font-medium">
+                        <div>
+                            Sprint Race
+                        </div>
+                        <div>
+                            @NextRace.Sprint.SessionTime.Value.ToString("MMMM dd ddd HH:mm")
+                        </div>
+                    </div>
+                }
+                <div class="flex w-fit flex-col justify-between font-medium">
+                    <div class="flex justify-between gap-5">
+                        <div>
+                            Practice 1
+                        </div>
+                        <div>
+                            @NextRace.FirstPractice.SessionTime.Value.ToString("ddd HH:mm")
+                        </div>
+                    </div>
+                    <div class="flex justify-between gap-5">
+                        <div>
+                            Practice 2
+                        </div>
+                        <div>
+                            @NextRace.SecondPractice.SessionTime.Value.ToString("ddd HH:mm")
+                        </div>
+                    </div>
+                    <div class="flex justify-between gap-5">
+                        <div>
+                            Practice 3
+                        </div>
+                        <div>
+                            @NextRace.ThirdPractice.SessionTime.Value.ToString("ddd HH:mm")
+                        </div>
+                    </div>
                 </div>
             </div>
-        }
+        </div>
     }
 </div>
 
