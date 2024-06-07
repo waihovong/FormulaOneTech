@@ -8,10 +8,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 
-builder.Services.AddHttpClient<ErgastService>(client =>
+builder.Services.AddTransient<IErgastService, ErgastService>();
+builder.Services.AddHttpClient<IErgastService, ErgastService>(client =>
 {
-    client.BaseAddress = new Uri("https://ergast.com/api/f1");
+    client.BaseAddress = new Uri("https://ergast.com/api/f1/");
 });
+
 
 var app = builder.Build();
 
