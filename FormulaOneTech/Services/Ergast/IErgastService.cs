@@ -6,5 +6,8 @@ namespace FormulaOneTech.Services.Ergast
     {
         Task<List<Driver>> GetDrivers(string year);
         Task<List<DriverStandings>> GetCurrentDriverStandings();
+        Task<List<ConstructorStandings>> GetConstructorStandings();
+        Task<List<Race>> GetCurrentSeason();
+        Task<RaceMapper.RaceDto> GetNextRace();
     }
 }

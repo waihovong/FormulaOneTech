@@ -10,6 +10,13 @@ namespace FormulaOneTech.Models.Ergast
     public class MRData
     {
         public StandingsTable StandingsTable { get; set; }
+        public RaceTable RaceTable { get; set; }
+    }
+
+    public class RaceTable
+    {
+        public string Season { get; set; }
+        public List<Race> Races { get; set; }
     }
 
     public class StandingsTable
@@ -23,14 +30,7 @@ namespace FormulaOneTech.Models.Ergast
         public string Season { get; set; } 
         public string Round { get; set; }
         public List<DriverStandings> DriverStandings { get; set; }
-    }
-
-    public class Constructor
-    {
-        public string ConstructorId { get; set; }
-        public string Url { get; set; }
-        public string Name { get; set; }
-        public string Nationality { get; set; }
+        public List<ConstructorStandings> ConstructorStandings { get; set; }
     }
 
 }
