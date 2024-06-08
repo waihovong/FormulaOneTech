@@ -1,0 +1,142 @@
+﻿@inject FormulaOneTech.Services.Ergast.IErgastService _ergastService;
+@using Models.Ergast;
+
+<div>
+    @if (isLoading)
+    {
+        <div>Loading...</div>
+    }
+    else
+    {
+        <div class="text-[#E4EDF5] bg-opacity-60 no-scrollbar overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter">
+            <div class="flex flex-row justify-between">
+                <table class="min-w-[625px] m-auto block whitespace-nowrap text-left text-sm font-semibold">
+                    <div>
+                        <span class="text-xl font-extrabold uppercase">
+                            Race Results
+                            <span class="text-red-600">Round @PreviousRaceResults.Round</span>
+                            <br />
+                            <span class="text-red-600">@PreviousRaceResults.Circuit.CircuitName</span>
+                        </span>
+                    </div>
+                    <thead class="border-b-2 dark:border-neutral-600">
+                        <tr class="text-left uppercase">
+                            <th class="px-5 py-2 text-left">Pos</th>
+                            <th class="px-5 py-2 text-left">Driver</th>
+                            <th class="px-5 py-2 text-left">Team</th>
+                            <th class="px-5 py-2 text-left">Time</th>
+                            <th class="px-5 py-2 text-left">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var driverResult in PreviousRaceResults.Results)
+                        {
+                            <tr class="border-b hover:bg-[#363E59] dark:border-neutral-600">
+                                <td class="border-l-0 border-t-0 border-b-0 border-4 border-solid border-@driverResult.Constructor.ConstructorId px-5 py-2 text-center">
+                                    @driverResult.Position
+                                </td>
+                                <td class="px-5 py-2 font-normal">
+                                    @driverResult.Driver.GivenName <span class="font-bold">@driverResult.Driver.FamilyName</span>
+                                </td>
+                                <td class="px-5 py-2 font-medium">
+                                    @driverResult.Constructor.Name
+                                </td>
+                                <td class="px-5 py-2">
+                                    @if (driverResult.Time == null)
+                                    {
+                                        if (driverResult.PositionText.ToLower() == "r")
+                                        {
+                                            <span>DNF</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@driverResult.Status</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="font-medium">@driverResult.Time?.time</span>
+                                    }
+                                </td>
+                                <td class="px-5 py-2 text-center">
+                                    @driverResult.Points
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <table class="m-auto block whitespace-nowrap text-left text-sm font-semibold">
+                    <div>
+                        <span class="text-xl font-extrabold uppercase">Qualifying Results</span>
+                        <br/>
+                        <span class="text-xl font-extrabold uppercase text-red-600">@PreviousRaceResults.Circuit.CircuitName</span>
+                    </div>
+                    <thead class="border-b-2 dark:border-neutral-600">
+                        <tr class="text-left uppercase">
+                            <th class="px-5 py-2 text-left">Pos</th>
+                            <th class="px-5 py-2 text-left">Driver</th>
+                            <th class="px-5 py-2 text-left">Team</th>
+                            <th class="px-5 py-2 text-left">Q1</th>
+                            <th class="px-5 py-2 text-left">Q2</th>
+                            <th class="px-5 py-2 text-left">Q3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var quali in PreviousQualiResults.QualifyingResults) //need to order by position
+                        {
+                            <tr class="border-b hover:bg-[#363E59] dark:border-neutral-600">
+                                <td class="border-l-0 border-t-0 border-b-0 border-4 border-solid border-@quali.Constructor.ConstructorId px-5 py-2 text-center">
+                                    @quali.Position
+                                </td>
+                                <td class="px-5 py-2 font-normal">
+                                    @quali.Driver.GivenName <span class="font-bold">@quali.Driver.FamilyName</span>
+                                </td>
+                                <td class="px-5 py-2 font-semibold">
+                                    @quali.Constructor.Name
+                                </td>
+                                <td class="px-5 py-2 font-semibold">
+                                    @quali.Q1
+                                </td>
+                                <td class="px-5 py-2 font-semibold">
+                                    @quali.Q2
+                                </td>
+                                <td class="px-5 py-2 font-semibold">
+                                    @quali.Q3
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    public RaceMapper.RaceDto PreviousRaceResults = new RaceMapper.RaceDto();
+    public RaceMapper.RaceDto PreviousQualiResults = new RaceMapper.RaceDto();
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreviousRaceResults = await GetPreviousRace();
+        if (PreviousRaceResults != null)
+        {
+            PreviousQualiResults = await GetPreviousRaceQualiResults();
+            isLoading = false;
+        }
+    }
+
+    private async Task<RaceMapper.RaceDto> GetPreviousRace()
+    {
+        var previousRace = await _ergastService.GetPreviousRaceResults();
+        return previousRace;
+    }
+
+    private async Task<RaceMapper.RaceDto> GetPreviousRaceQualiResults()
+    {
+        var qualiResults = await _ergastService.GetPreviousQualiResults(PreviousRaceResults.Season, PreviousRaceResults.Round);
+        return qualiResults;
+    }
+}

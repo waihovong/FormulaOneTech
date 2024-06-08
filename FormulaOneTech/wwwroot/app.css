@@ -27,3 +27,93 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.team-alpine {
+    color: #FF87BC;
+}
+
+.team-aston_martin {
+    color: #229971;
+}
+
+.team-ferrari {
+    color: #E8002D;
+}
+
+.team-haas {
+    color: #B6BABD;
+}
+
+.team-mclaren {
+    color: #FF8000;
+}
+
+.team-mercedes {
+    color: #27F4D2;
+}
+
+.team-rb {
+    color: #6692FF;
+}
+
+.team-red_bull {
+    color: #3671C6;
+}
+
+.team-sauber {
+    color: #52E252;
+}
+
+.team-williams {
+    color: #64C4FF;
+}
+
+.border-alpine {
+    --tw-border-opacity: 1;
+    border-color: rgb(255 135 188 / var(--tw-border-opacity));
+}
+
+.border-aston_martin {
+    --tw-border-opacity: 1;
+    border-color: rgb(34 153 113 / var(--tw-border-opacity));
+}
+
+.border-ferrari {
+    --tw-border-opacity: 1;
+    border-color: rgb(232 0 45 / var(--tw-border-opacity));
+}
+
+.border-haas {
+    --tw-border-opacity: 1;
+    border-color: rgb(182 186 189 / var(--tw-border-opacity));
+}
+
+.border-mclaren {
+    --tw-border-opacity: 1;
+    border-color: rgb(255 128 0 / var(--tw-border-opacity));
+}
+
+.border-mercedes {
+    --tw-border-opacity: 1;
+    border-color: rgb(39 244 210 / var(--tw-border-opacity));
+}
+
+.border-rb {
+    --tw-border-opacity: 1;
+    border-color: rgb(102 146 255 / var(--tw-border-opacity));
+}
+
+.border-red_bull {
+    --tw-border-opacity: 1;
+    border-color: rgb(54 113 198 / var(--tw-border-opacity));
+}
+
+.border-sauber {
+    --tw-border-opacity: 1;
+    border-color: rgb(82 226 82 / var(--tw-border-opacity));
+}
+
+.border-williams {
+    --tw-border-opacity: 1;
+    border-color: rgb(100 196 255 / var(--tw-border-opacity));
+}

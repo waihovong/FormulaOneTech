@@ -9,5 +9,7 @@ namespace FormulaOneTech.Services.Ergast
         Task<List<ConstructorStandings>> GetConstructorStandings();
         Task<List<Race>> GetCurrentSeason();
         Task<RaceMapper.RaceDto> GetNextRace();
+        Task<RaceMapper.RaceDto> GetPreviousRaceResults();
+        Task<RaceMapper.RaceDto> GetPreviousQualiResults(string year, string round);
     }
 }

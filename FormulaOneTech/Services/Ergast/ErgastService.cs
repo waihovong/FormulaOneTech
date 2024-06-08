@@ -165,13 +165,68 @@ namespace FormulaOneTech.Services.Ergast
             return new RaceMapper.RaceDto();
         }
 
-        public static DateTime ConvertLocal(DateTime? utcTime, TimeZoneInfo localTimeZone)
+        
+        public async Task<RaceMapper.RaceDto> GetPreviousRaceResults()
         {
-            return TimeZoneInfo.ConvertTimeToUtc(utcTime.Value, localTimeZone);
+            var response = await _httpClient.GetAsync("current/last/results.json");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                var results = JsonSerializer.Deserialize<ErgastRootModel>(data, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                var previousResults = results?.MRData?.RaceTable?.Races?
+                    .Select(r => new Race()
+                    {
+                        Round = r.Round,
+                        Circuit = r.Circuit,
+                        Season = r.Season,
+                        Date = r.Date,
+                        Time = r.Time,
+                        Results = r.Results
+
+                    }).FirstOrDefault();
+
+                if (previousResults != null)
+                {
+                    return RaceMapper.RaceMapDto(previousResults);
+                }
+            }
+            return new RaceMapper.RaceDto();
         }
 
+        public async Task<RaceMapper.RaceDto> GetPreviousQualiResults(string year, string round)
+        {
+            var response = await _httpClient.GetAsync($"{year}/{round}/qualifying.json");
 
-        //todo have another function that will get the next race here and do all the stuff here
-        //http://ergast.com/api/f1/current/last/results.json
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                var results = JsonSerializer.Deserialize<ErgastRootModel>(data, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                var qualiResults = results?.MRData?.RaceTable?.Races?
+                    .Select(r => new Race
+                    {
+                        QualifyingResults = r.QualifyingResults
+                    }).FirstOrDefault();
+                if (qualiResults != null)
+                {
+                    return RaceMapper.RaceMapDto(qualiResults);
+                }
+            }
+            return new RaceMapper.RaceDto();
+
+        }
+
+        //function to get both race results and quali results
+        //GetPreviousRoundResults()
     }
 }

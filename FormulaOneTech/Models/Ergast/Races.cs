@@ -15,7 +15,9 @@ namespace FormulaOneTech.Models.Ergast
         public SecondPractice SecondPractice { get; set; }
         public ThirdPractice ThirdPractice { get; set; }
         public Qualifying Qualifying { get; set; }
+        public List<QualifyingResults> QualifyingResults { get; set; }
         public Sprint Sprint { get; set; }
+        public List<Result> Results { get; set; }
     }
 
     public class Circuit
@@ -59,5 +61,16 @@ namespace FormulaOneTech.Models.Ergast
     {
         public string Date { get; set; }
         public string Time { get; set; }
+    }
+
+    public class QualifyingResults
+    {
+        public string? Number { get; set; }
+        public string? Position { get; set; }
+        public Driver Driver { get; set; }
+        public Constructor Constructor { get; set; }
+        public string? Q1 { get; set; }
+        public string? Q2 { get; set; }
+        public string? Q3 { get; set; }
     }
 }
