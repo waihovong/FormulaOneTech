@@ -21,11 +21,45 @@ public static class RaceMapper
         public List<QualifyingResults> QualifyingResults { get; set; }
     }
 
+    public class RaceGraphDto
+    {
+        public LapIntervalDto LapIntervalDto { get; set; }
+        public TimingDto TimingDto { get; set; }
+    }
+
+    public class LapIntervalDto
+    {
+        public string Number { get; set; }
+        public List<TimingDto>? Timings { get; set; }
+    }
+
+    public class TimingDto
+    {
+        public string DriverId { get; set; }
+        public string Position { get; set; }
+        public string Time { get; set; }
+    }
+
     public class SessionsDto
     {
         public DateTime? Date { get; set; }
         public DateTime? Time { get; set; }
         public DateTime? SessionTime { get; set; }
+    }
+
+    public static LapIntervalDto LapMapDto(List<Lap>? lap)
+    {
+        return new LapIntervalDto
+        {
+            Number = lap.Select(r => r.Number).FirstOrDefault() ?? string.Empty,
+            Timings = lap.SelectMany(lap => lap.Timings.Select(t => new TimingDto
+            {
+                //Time = Common.ConvertToDecimalMinutes(t.Time),
+                Time = t.Time,
+                DriverId = t.DriverId,
+                Position = t.Position
+            })).ToList()
+        };
     }
 
     public static RaceDto RaceMapDto(Race race)

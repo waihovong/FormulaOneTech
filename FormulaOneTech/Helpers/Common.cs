@@ -15,19 +15,6 @@ namespace FormulaOneTech.Helpers
             return null;
         }
 
-        public static DateTime? ConvertRaceTime(string timeString)
-        {
-            string format = "HH:mm:ss'Z'";
-            if (DateTime.TryParseExact(timeString, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime utcTime))
-            {
-                return utcTime.ToLocalTime();
-            }
-            else
-            {
-                throw new FormatException("Invalid time string format");
-            }
-        }
-
         public static DateTime? ParseSessionTime(string dateString, string timeString)
         {
             if (string.IsNullOrEmpty(dateString) || string.IsNullOrEmpty(timeString))
@@ -45,7 +32,20 @@ namespace FormulaOneTech.Helpers
             {
                 return null;
             }
+        }
+        
+        public static decimal? ConvertToDecimalMinutes(string time)
+        {
+            var timeParts = time.Split(':', '.');
 
+            int minutes = int.Parse(timeParts[0]);
+            int seconds = int.Parse(timeParts[1]);
+            int milliseconds = int.Parse(timeParts[2]);
+
+            // Calculate the total number of seconds
+            decimal lapTime = minutes * 60 + seconds + (decimal)milliseconds / 1000;
+
+            return lapTime;
         }
     }
 }

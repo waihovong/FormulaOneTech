@@ -9,11 +9,10 @@
   <ItemGroup>
     <Folder Include="Configuration\" />
     <Folder Include="Models\OpenF1\" />
-    <Folder Include="Services\OpenF1\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazor-ApexCharts" Version="3.3.0" />
+    <PackageReference Include="AntDesign.Charts" Version="0.5.1" />
   </ItemGroup>
 
 </Project>

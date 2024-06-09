@@ -18,6 +18,7 @@ namespace FormulaOneTech.Models.Ergast
         public List<QualifyingResults> QualifyingResults { get; set; }
         public Sprint Sprint { get; set; }
         public List<Result> Results { get; set; }
+        public List<Lap> Laps { get; set; }
     }
 
     public class Circuit
@@ -72,5 +73,18 @@ namespace FormulaOneTech.Models.Ergast
         public string? Q1 { get; set; }
         public string? Q2 { get; set; }
         public string? Q3 { get; set; }
+    }
+
+    public class Lap
+    {
+        public string? Number { get; set; }
+        public List<Timing>? Timings { get; set; }
+    }
+
+    public class Timing
+    {
+        public string DriverId { get; set; }
+        public string Position { get; set; }
+        public string Time { get; set; }
     }
 }

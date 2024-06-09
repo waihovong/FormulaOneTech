@@ -11,5 +11,6 @@ namespace FormulaOneTech.Services.Ergast
         Task<RaceMapper.RaceDto> GetNextRace();
         Task<RaceMapper.RaceDto> GetPreviousRaceResults();
         Task<RaceMapper.RaceDto> GetPreviousQualiResults(string year, string round);
+        Task<RaceMapper.LapIntervalDto> GetSelectedDriverRacePace(string driverCode, string season, string round);
     }
 }

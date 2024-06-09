@@ -1,0 +1,87 @@
+﻿@using Models.Ergast;
+@using AntDesign.Charts
+@if (DriverSelected)
+{
+    @* <Line Data="datas" Config="config" /> *@
+    <Line Data="GraphData" Config="config" />
+}
+
+@code {
+    private bool Reload = false;
+
+    LineConfig config = new LineConfig()
+        {
+            Padding = "auto",
+            XField = "lap",
+            YField = "lap_time",
+            Smooth = false,
+            XAxis = new ValueCatTimeAxis
+            {
+                TickCount = 15,
+                Title = new BaseAxisTitle
+                {
+                    Visible = true,
+                    Text = "Laps",
+                    Style = new TextStyle
+                    {
+                        Color = "white"
+                    }
+                }
+            },
+            YAxis = new ValueAxis
+            {
+                TickCount = 4,
+                MinLimit = 0
+            }
+        };
+
+
+    List<int> LapCount = new List<int>();
+
+    object[] datas = new object[200];
+    public object[] GraphData { get; set; }
+
+    [Parameter]
+    public bool DriverSelected { get; set; }
+
+    [Parameter]
+    public List<RaceMapper.TimingDto> TimingData { get; set; } = new List<RaceMapper.TimingDto>();
+
+    [Parameter]
+    public RaceMapper.LapIntervalDto DriverData { get; set; } = new RaceMapper.LapIntervalDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // if (TimingData != null)
+        // {
+        //     StateHasChanged();
+        // }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var transformData = DriverData.Timings.Skip(2);
+
+        if (TimingData != null && DriverSelected)
+        {
+            // DriverSelected = false;
+            StateHasChanged();
+
+            var data = transformData?.Select((timing, index) => new
+            {
+                lap = index + 2,
+                lap_time = timing.Time,
+                driver = timing.DriverId
+
+            }).OrderBy(a => a.lap_time).ToArray();
+
+            GraphData = data;
+
+        }
+    }
+
+    public void RefreshData()
+    {
+        
+    }
+}

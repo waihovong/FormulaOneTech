@@ -7,6 +7,7 @@ namespace FormulaOneTech.Services.Ergast
     {
         private readonly HttpClient _httpClient;
 
+        private const int API_LIMIT = 80; //API allows maximum of 1000 limit, but advises to use least amount
         public ErgastService (HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -226,7 +227,32 @@ namespace FormulaOneTech.Services.Ergast
 
         }
 
-        //function to get both race results and quali results
-        //GetPreviousRoundResults()
+        public async Task<RaceMapper.LapIntervalDto> GetSelectedDriverRacePace(string driverCode, string season, string round)
+        {
+
+            var response = await _httpClient.GetAsync($"{season}/{round}/drivers/{driverCode}/laps.json?limit={API_LIMIT}");
+
+            if(response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadAsStringAsync();
+
+                var results = JsonSerializer.Deserialize<ErgastRootModel>(data, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                var driver = results?.MRData?.RaceTable?.Races?
+                    .Select(r => new Race
+                    {
+                        Laps = r.Laps
+                    }).ToList();
+
+                if (driver != null && driver.Count() > 0)
+                {
+                    return RaceMapper.LapMapDto(driver.FirstOrDefault()?.Laps);
+                }
+            }
+            return new RaceMapper.LapIntervalDto();
+        }
     }
 }
