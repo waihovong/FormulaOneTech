@@ -1,4 +1,5 @@
 using FormulaOneTech.Components;
+using FormulaOneTech.Services.Circuit;
 using FormulaOneTech.Services.Ergast;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddHttpClient<IErgastService, ErgastService>(client =>
     client.BaseAddress = new Uri("https://ergast.com/api/f1/");
 });
 
+builder.Services.AddSingleton<ImageMappingService>();
 
 var app = builder.Build();
 

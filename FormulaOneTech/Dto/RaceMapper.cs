@@ -11,6 +11,7 @@ public static class RaceMapper
         public string Time { get; set; }
         public string RaceName { get; set; }
         public DateTime? SessionTime { get; set; }
+        public SessionsDto? Race { get; set; } = new SessionsDto();
         public SessionsDto? FirstPractice { get; set; } = new SessionsDto();
         public SessionsDto? SecondPractice { get; set; } = new SessionsDto();
         public SessionsDto? ThirdPractice { get; set; } = new SessionsDto();
@@ -45,6 +46,7 @@ public static class RaceMapper
         public DateTime? Date { get; set; }
         public DateTime? Time { get; set; }
         public DateTime? SessionTime { get; set; }
+        public string SessionName { get; set; }
     }
 
     public static LapIntervalDto LapMapDto(List<Lap>? lap)
@@ -75,30 +77,41 @@ public static class RaceMapper
             Circuit = race.Circuit,
             RaceName = race.RaceName,
             Results = race.Results,
+            Race = race.Time != null ? new SessionsDto
+            {
+                Date = Common.ParseDateTime(race.Date),
+                SessionTime = Common.ParseSessionTime(race.Date, race.Time),
+                SessionName = "Race"
+            } : null,
             FirstPractice = race.FirstPractice != null ? new SessionsDto
             {
                 SessionTime = Common.ParseSessionTime(race.FirstPractice.Date, race.FirstPractice.Time),
                 Date = Common.ParseDateTime(race.FirstPractice.Date),
+                SessionName = "Free Practice 1"
             } : null,
             Qualifying = race.Qualifying != null ? new SessionsDto
             {
                 SessionTime = Common.ParseSessionTime(race.Qualifying.Date, race.Qualifying.Time),
                 Date = Common.ParseDateTime(race.Qualifying.Date),
+                SessionName = "Qualifying"
             } : null,
             SecondPractice = race.SecondPractice != null ? new SessionsDto 
             { 
                 SessionTime = Common.ParseSessionTime(race.SecondPractice.Date, race.SecondPractice.Time),
                 Date = Common.ParseDateTime(race.SecondPractice.Date),
+                SessionName = "Free Practice 2"
             } : null,
             ThirdPractice = race.ThirdPractice != null ? new SessionsDto 
             { 
                 SessionTime = Common.ParseSessionTime(race.ThirdPractice.Date, race.ThirdPractice.Time),
                 Date = Common.ParseDateTime(race.ThirdPractice.Date),
+                SessionName = "Free Practice 3"
             } : null,
             Sprint = race.Sprint != null ? new SessionsDto 
             { 
                 SessionTime = Common.ParseSessionTime(race.Sprint.Date, race.Sprint.Time),
                 Date = Common.ParseDateTime(race.Sprint.Date),
+                SessionName = "Sprint"
             } : null,
         };
     }

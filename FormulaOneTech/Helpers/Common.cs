@@ -34,8 +34,13 @@ namespace FormulaOneTech.Helpers
             }
         }
         
-        public static decimal? ConvertToDecimalMinutes(string time)
+        public static decimal? ConvertToDecimalMinutes(string? time)
         {
+            if (time == null)
+            {
+                return decimal.MaxValue;
+            }
+
             var timeParts = time.Split(':', '.');
 
             int minutes = int.Parse(timeParts[0]);
@@ -43,7 +48,7 @@ namespace FormulaOneTech.Helpers
             int milliseconds = int.Parse(timeParts[2]);
 
             // Calculate the total number of seconds
-            decimal lapTime = minutes * 60 + seconds + (decimal)milliseconds / 1000;
+            decimal lapTime = (minutes * 60 * 1000) + seconds * 1000 + milliseconds;
 
             return lapTime;
         }

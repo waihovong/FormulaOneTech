@@ -1,9 +1,14 @@
 ﻿@using Models.Ergast;
 @using AntDesign.Charts
-@if (DriverSelected)
+@if (DriverSelected && GraphData != null)
 {
-    @* <Line Data="datas" Config="config" /> *@
-    <Line Data="GraphData" Config="config" />
+    <div class="w-full">
+        <Line Data="GraphData" Config="config" />
+    </div>
+}
+else if (GraphData == null)
+{
+    <div>There was a problem fetching this.</div>
 }
 
 @code {
@@ -15,23 +20,43 @@
             XField = "lap",
             YField = "lap_time",
             Smooth = false,
+            AutoFit = true,
             XAxis = new ValueCatTimeAxis
             {
                 TickCount = 15,
                 Title = new BaseAxisTitle
                 {
                     Visible = true,
-                    Text = "Laps",
+                    Text = "Lap Number",
                     Style = new TextStyle
                     {
-                        Color = "white"
+                        FontWeight = 4,
+                        Fill = "#ffffff",
                     }
-                }
+                },
+                Min = 0,
+                Grid = new BaseAxisGrid
+                {
+                    Visible = true,
+                },
+            },
+            Point = new LineViewConfigPoint
+            {
+                Visible = true
             },
             YAxis = new ValueAxis
             {
+                Title = new BaseAxisTitle
+                {
+                    Visible = true,
+                    Style = new TextStyle
+                    {
+                        Fill = "#ffffff"
+                    },
+                    Text = "Lap Time"
+                },
                 TickCount = 4,
-                MinLimit = 0
+                Min = -4,
             }
         };
 
@@ -52,10 +77,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // if (TimingData != null)
-        // {
-        //     StateHasChanged();
-        // }
+
     }
 
     protected override async Task OnParametersSetAsync()
@@ -78,10 +100,5 @@
             GraphData = data;
 
         }
-    }
-
-    public void RefreshData()
-    {
-        
     }
 }

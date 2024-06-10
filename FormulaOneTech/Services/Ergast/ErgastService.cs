@@ -188,7 +188,8 @@ namespace FormulaOneTech.Services.Ergast
                         Season = r.Season,
                         Date = r.Date,
                         Time = r.Time,
-                        Results = r.Results
+                        Results = r.Results,
+                        RaceName = r.RaceName,
 
                     }).FirstOrDefault();
 
