@@ -11,11 +11,7 @@
 }
 
 @code {
-    private bool Reload = false;
 
-    List<int> LapCount = new List<int>();
-
-    object[] datas = new object[200];
     public object[] GraphData { get; set; }
 
     [Parameter]
@@ -30,35 +26,121 @@
     [Parameter]
     public Dictionary<string, RaceMapper.LapIntervalDto> LapIntervalDataList { get; set; }
 
+    private HashSet<object> ProcessedDriver = new HashSet<object>();
+
     PlotlyChart chart;
-    Config config = new Config();
-    Layout layout = new Layout();
+    Config config = new Config()
+    {
+        Responsive = true,
+        ShowAxisDragHandles = false,
+        AutoSizable = true,
+        ToImageButtonOptions = false,
+        Editable = false,
+        ShowSendToCloud = false,
+        DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False
+    };
+    Layout layout = new Layout()
+    {
+        YAxis = new List<YAxis>
+        {
+            new YAxis
+            {
+                AutoTypeNumbers = Plotly.Blazor.LayoutLib.YAxisLib.AutoTypeNumbersEnum.ConvertTypes,
+                Type = Plotly.Blazor.LayoutLib.YAxisLib.TypeEnum.Category,
+                CategoryOrder = Plotly.Blazor.LayoutLib.YAxisLib.CategoryOrderEnum.CategoryAscending,
+                NTicks = 4,
+                Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title
+                {
+                    Text = "Lap Time"
+                },
+                Color = "#ffffff"
+            }
+        },
+        XAxis = new List<XAxis>
+        {
+            new XAxis
+            {
+                NTicks = 15,
+                Title = new Plotly.Blazor.LayoutLib.XAxisLib.Title
+                {
+                    Text = "Lap Number"
+                },
+                Color = "#ffffff"
+            }
+        },
+        HoverMode = HoverModeEnum.XUnified,
+        HoverLabel = new HoverLabel
+        {
+            BgColor = "#ffffff"
+        },
+        Title = new Title
+        {
+            Font = new Plotly.Blazor.LayoutLib.TitleLib.Font
+            {
+                Size = 13,
+                Color = "#ffffff"
+            }
+        },
+        PaperBgColor = "rgb(48, 48, 48)",
+        PlotBgColor = "rgb(48, 48, 48)"
+    };
+
     private IList<ITrace> graph_data;
 
-    protected override async Task OnInitializedAsync()
+    private async Task AddDriverToGraph(object[] xData, string[] yData, string driverId)
     {
-
-    }
-
-    private async void AddDriverToGraph(object[] xData, string[] yData)
-    {
-        await chart.AddTrace(new Scatter
+        if (chart != null)
         {
-            Mode = Plotly.Blazor.Traces.ScatterLib.ModeFlag.Lines | Plotly.Blazor.Traces.ScatterLib.ModeFlag.Markers,
-            X = xData,
-            Y = yData
-        });
+            await chart.AddTrace(new Scatter
+                {
+                    Name = driverId,
+                    Mode = Plotly.Blazor.Traces.ScatterLib.ModeFlag.Lines | Plotly.Blazor.Traces.ScatterLib.ModeFlag.Markers,
+                    X = xData,
+                    Y = yData
+                });
+            base.OnInitialized();
+        }
     }
 
+    /// <summary>
+    /// Getting data for the chart
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnParametersSetAsync()
     {
-        var test = LapIntervalDataList;
-
-        foreach(var driver in LapIntervalDataList)
+        if (LapIntervalDataList.Count > 0)
         {
-            if (driver.Value != null && DriverSelected)
+            var selectedDriver = LapIntervalDataList.Last();
+
+            var initialData = selectedDriver.Value.Timings.Skip(1).Select((timing, index) => new
             {
-                var data = driver.Value.Timings.Skip(1).Select((timing, index) => new
+                lap = index + 2,
+                lap_time = timing.Time,
+                driver = timing.DriverId
+            }).ToList();
+
+            //if initial data populate with the selected driver
+            if (graph_data == null)
+            {
+                //another list to keep track of processed drivers 
+
+                var xData = initialData?.Select(r => (object)r.lap).ToArray();
+                var yData = initialData?.Select(r => r.lap_time).ToArray();
+                var initialTrace = new Scatter
+                {
+                    Name = initialData?.Select(r => r.driver).FirstOrDefault(),
+                    Mode = Plotly.Blazor.Traces.ScatterLib.ModeFlag.Lines | Plotly.Blazor.Traces.ScatterLib.ModeFlag.Markers,
+                    X = xData,
+                    Y = yData
+                };
+                graph_data = new List<ITrace> { initialTrace };
+                ProcessedDriver.Add(selectedDriver.Key);
+                base.OnInitialized();
+            }
+            else //if not then populate with other drivers
+            {                
+
+                var data = selectedDriver.Value.Timings.Skip(1).Select((timing, index) => new
                 {
                     lap = index + 2,
                     lap_time = timing.Time,
@@ -68,105 +150,16 @@
                 var xAxis = data?.Select(r => (object)r.lap).ToArray();
                 var yAxis = data?.Select(r => r.lap_time).ToArray();
 
-                AddDriverToGraph(xAxis, yAxis);
+                //add the driver to the graph and add them to list 
+                if (!ProcessedDriver.Contains(selectedDriver.Key))
+                {
+                    AddDriverToGraph(xAxis, yAxis, data?.Select(r => r.driver).FirstOrDefault());
+                    ProcessedDriver.Add(selectedDriver.Key);
+                }
+                
             }
+
+
         }
-
-        // var transformData = DriverData.Timings.Skip(1);
-
-        // if (TimingData != null && DriverSelected)
-        // {
-            // StateHasChanged();
-            // var count = TimingData.Count;
-
-            // var data = transformData?.Select((timing, index) => new
-            // {
-            //     lap = index + 2,
-            //     lap_time = timing.Time,
-            //     driver = timing.DriverId
-
-            // }).ToList();
-
-            // // GraphData = data;
-
-            // var xAxis = data?.Select(r => (object)r.lap).ToArray();
-            // var yAxis = data?.Select(r => r.lap_time).ToArray();
-
-            #region config
-
-            // graph_data = new List <ITrace>
-            // {
-            //     new Scatter
-            //     {
-            //         Name = "Test",
-            //         Mode = Plotly.Blazor.Traces.ScatterLib.ModeFlag.Lines | Plotly.Blazor.Traces.ScatterLib.ModeFlag.Markers,
-            //         X = xAxis,
-            //         Y = yAxis,
-            //         ConnectGaps = true,
-            //         TextArray = ["Lap", "Lap Time"]
-            //     }
-            // };
-
-            config = new Config
-            {
-                Responsive = true,
-                ShowAxisDragHandles = false,
-                AutoSizable = true,
-                ToImageButtonOptions = false,
-                Editable = false,
-                ShowSendToCloud = false,
-                DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False
-            };
-
-            layout = new Layout
-            {
-                YAxis = new List<YAxis>
-                {
-                    new YAxis
-                    {
-                        AutoTypeNumbers = Plotly.Blazor.LayoutLib.YAxisLib.AutoTypeNumbersEnum.ConvertTypes,
-                        Type = Plotly.Blazor.LayoutLib.YAxisLib.TypeEnum.Category,
-                        CategoryOrder = Plotly.Blazor.LayoutLib.YAxisLib.CategoryOrderEnum.CategoryAscending,
-                        NTicks = 4,
-                        Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title
-                        {
-                            Text = "Lap Time"
-                        },
-                        Color = "#ffffff"
-                    }
-                },
-                XAxis = new List<XAxis>
-                {
-                    new XAxis
-                    {
-                        NTicks = 5,
-                        Title = new Plotly.Blazor.LayoutLib.XAxisLib.Title
-                        {
-                            Text = "Lap Number"
-                        },
-                        Color = "#ffffff"
-                    }
-                },
-                HoverMode = HoverModeEnum.XUnified,
-                HoverLabel = new HoverLabel
-                {
-                    BgColor = "#ffffff"
-                },
-                Title = new Title
-                {
-                    Text = $"Race Pace of {DriverData.Timings.FirstOrDefault().DriverId.ToUpper()}",
-                    Font = new Plotly.Blazor.LayoutLib.TitleLib.Font
-                    {
-                        Size = 13,
-                        Color = "#ffffff"
-                    }
-                },
-                PaperBgColor = "rgb(48, 48, 48)",
-                PlotBgColor = "rgb(48, 48, 48)"
-            };
-            #endregion
-
-            base.OnInitialized();
-        // }
     }
 }
