@@ -1,0 +1,24 @@
+﻿<div>
+    <input type="range" min="@Min" max="@Max" @bind="Value" @bind:event="oninput" onchange="@OnChange" />
+    <p>Lap @Value</p>
+</div>
+
+@code {
+    [Parameter]
+    public int Min { get; set; } = 1;
+
+    [Parameter]
+    public int Max { get; set; }
+
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SliderValueChanged { get; set; }
+
+    private Task OnChange(ChangeEventArgs e)
+    {
+         Value = Convert.ToInt32(e.Value);
+        return SliderValueChanged.InvokeAsync(Value);
+    }
+}

@@ -1,6 +1,7 @@
 using FormulaOneTech.Components;
 using FormulaOneTech.Services.Circuit;
 using FormulaOneTech.Services.Ergast;
+using FormulaOneTech.Services.OpenF1;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,11 @@ builder.Services.AddScoped<IErgastService, ErgastService>();
 builder.Services.AddHttpClient<IErgastService, ErgastService>(client =>
 {
     client.BaseAddress = new Uri("https://ergast.com/api/f1/");
+});
+
+builder.Services.AddHttpClient<IOpenF1Service, OpenF1Service>(client =>
+{
+    client.BaseAddress = new Uri("https://api.openf1.org/v1/");
 });
 
 builder.Services.AddSingleton<ImageMappingService>();

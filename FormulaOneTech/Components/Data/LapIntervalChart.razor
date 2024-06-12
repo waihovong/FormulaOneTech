@@ -5,7 +5,6 @@
 @if (DriverSelected)
 {
     <div class="w-full">
-        @* <Line Data="GraphData" Config="config" /> *@
         <PlotlyChart style="height: 25vh; min-height: 350px; border-radius:10px" @bind-Config="config" @bind-Layout="layout" @bind-Data="graph_data" @ref="chart" />
     </div>
 }

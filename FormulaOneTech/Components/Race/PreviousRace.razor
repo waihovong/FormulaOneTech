@@ -185,6 +185,9 @@
 
     public bool driverSelected = false;
 
+    [Parameter]
+    public EventCallback<DateTime?> PreviousRaceDate { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         PreviousRaceResults = await GetPreviousRace();
@@ -214,6 +217,7 @@
     private async Task<RaceMapper.RaceDto> GetPreviousRace()
     {
         var previousRace = await _ergastService.GetPreviousRaceResults();
+        await PreviousRaceDate.InvokeAsync(previousRace?.Date);
         return previousRace;
     }
 

@@ -558,6 +558,10 @@ video {
   position: static;
 }
 
+.-z-10 {
+  z-index: -10;
+}
+
 .-mt-2 {
   margin-top: -0.5rem;
 }
@@ -568,6 +572,10 @@ video {
 
 .mt-0 {
   margin-top: 0px;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 
 .block {
@@ -594,8 +602,16 @@ video {
   height: 5px;
 }
 
+.h-\[70vh\] {
+  height: 70vh;
+}
+
 .max-h-\[600px\] {
   max-height: 600px;
+}
+
+.max-h-\[500px\] {
+  max-height: 500px;
 }
 
 .w-10\/12 {
@@ -608,6 +624,10 @@ video {
 
 .w-\[350px\] {
   width: 350px;
+}
+
+.w-\[500px\] {
+  width: 500px;
 }
 
 .w-\[5px\] {
@@ -633,6 +653,10 @@ video {
 
 .max-w-\[45px\] {
   max-width: 45px;
+}
+
+.max-w-\[500px\] {
+  max-width: 500px;
 }
 
 @keyframes ping {
@@ -676,6 +700,10 @@ video {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
 }
 
 .gap-1 {
@@ -724,6 +752,10 @@ video {
 
 .border-8 {
   border-width: 8px;
+}
+
+.border {
+  border-width: 1px;
 }
 
 .border-b {
@@ -779,6 +811,11 @@ video {
   background-color: rgb(115 115 115 / var(--tw-bg-opacity));
 }
 
+.bg-neutral-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
+}
+
 .bg-red-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
@@ -799,8 +836,16 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-\[\#0000005e\] {
+  background-color: #0000005e;
+}
+
 .bg-opacity-10 {
   --tw-bg-opacity: 0.1;
+}
+
+.bg-opacity-20 {
+  --tw-bg-opacity: 0.2;
 }
 
 .bg-opacity-25 {
@@ -809,6 +854,25 @@ video {
 
 .bg-opacity-60 {
   --tw-bg-opacity: 0.6;
+}
+
+.bg-gradient-to-t {
+  background-image: linear-gradient(to top, var(--tw-gradient-stops));
+}
+
+.from-white {
+  --tw-gradient-from: #fff var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.via-black {
+  --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #000 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.to-black {
+  --tw-gradient-to: #000 var(--tw-gradient-to-position);
 }
 
 .bg-clip-padding {
@@ -889,6 +953,10 @@ video {
 
 .text-center {
   text-align: center;
+}
+
+.text-\[10px\] {
+  font-size: 10px;
 }
 
 .text-\[11px\] {
