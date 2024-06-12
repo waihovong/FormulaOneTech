@@ -99,5 +99,25 @@ namespace FormulaOneTech.Services.OpenF1
             //https://api.openf1.org/v1/race_control?date=2024-06-09
             throw new NotImplementedException();
         }
+
+        public async Task<List<TeamRadio>> GetDriverRadioAudio(Dictionary<string, string> additionalParams)
+        {
+            try
+            {
+                var queryString = BuildQueryString(additionalParams);
+                var uribuilder = new UriBuilder(_httpClient.BaseAddress + "team_radio")
+                { Query = queryString };
+
+                var response = await _httpClient.GetAsync(uribuilder.ToString());
+                var data = await response.Content.ReadAsStringAsync();
+                var driverAudio = JsonSerializer.Deserialize<List<TeamRadio>>(data);
+
+                return driverAudio;
+            }
+            catch
+            {
+                return new List<TeamRadio>();
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace FormulaOneTech.Services.Ergast
 {
     public interface IErgastService
     {
-        Task<List<Driver>> GetDrivers(string year);
+        Task<List<Driver>> GetDrivers(string year = "current");
         Task<List<DriverStandings>> GetCurrentDriverStandings();
         Task<List<ConstructorStandings>> GetConstructorStandings();
         Task<List<Race>> GetCurrentSeason();

@@ -2,39 +2,24 @@
 @using FormulaOneTech.Services.OpenF1;
 @using Models.OpenF1;
 
-<h3>EngineeringPitWall</h3>
-<div class="text-[#E4EDF5] bg-opacity-60 overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter">
+<div class="w-[550px] text-[#E4EDF5] bg-opacity-60 overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter" >
     @if (isLoading)
     {
         <div>Loading...</div>
     }
     else
     {
-        <div class="max-h-[500px] overflow-y-auto bg-red-700">
-        @*<div class="just-end flex">
-            <FormulaOneTech.Components.Slider.Slider Min="1" Max="100" Value="SliderValue" SliderValueChanged="OnSliderValueChanged" />
-        </div> *@
-            
+        <div class="mb-2 text-base font-bold">Race Control</div>
+        <div class="max-h-[300px] overflow-y-auto overflow-x-hidden">
         @foreach (var racedata in RaceControls)
         {
             <div class="bg-opacity-20 w-[500px] max-w-[500px] bg-[#0000005e] mb-2 flex items-center gap-4 rounded-lg p-2 text-sm font-medium">
                 <div class="whitespace-nowrap rounded-lg p-2 text-xs">Lap @racedata.LapNumber</div>
-                <div class="w-full">@racedata.Message</div>
+                    <div class="w-full" style="padding-left: 10px; border-left:5px solid @GetFlagStyle(racedata.Flag); border-radius: 0">@racedata.Message</div>
                 <div>@racedata.Date.Value.ToString("H:mm")</div>
             </div>
         }
-            
-        @* if (FilteredRaceControlData != null)
-        {
-            @foreach (var filteredMessage in FilteredRaceControlData)
-            {
-                <div>Lap @filteredMessage.LapNumber</div>
-                <div>@filteredMessage.Message</div>
-            }
-        } *@
-            
         </div>
-
     }
 </div>
 
@@ -59,6 +44,24 @@
     private List<RaceControl> FilteredRaceControlData { get; set; } = new List<RaceControl>();
 
     public IEnumerable<dynamic> Categories { get; set; }
+
+    public Dictionary<string, string> FlagStyle { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        {"green", "#25D51F"},
+        {"red", "#D5381C"},
+        {"yellow", "#FFC31F"},
+        {"blue", "#44AEFF"},
+        {"double yellow", "#FF9320"}
+    };
+
+    public string GetFlagStyle(string flag)
+    {
+        if (!string.IsNullOrEmpty(flag) && FlagStyle.ContainsKey(flag.ToLower()))
+        {
+            return FlagStyle[flag];
+        }
+        return "transparent";
+    }
 
     protected override async Task OnInitializedAsync()
     {

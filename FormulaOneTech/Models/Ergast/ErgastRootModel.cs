@@ -11,12 +11,19 @@ namespace FormulaOneTech.Models.Ergast
     {
         public StandingsTable StandingsTable { get; set; }
         public RaceTable RaceTable { get; set; }
+        public DriverTable DriverTable { get; set; }
     }
 
     public class RaceTable
     {
         public string Season { get; set; }
         public List<Race> Races { get; set; }
+    }
+
+    public class DriverTable
+    {
+        public string Season { get; set; }
+        public List<Driver> Drivers { get; set; }
     }
 
     public class StandingsTable

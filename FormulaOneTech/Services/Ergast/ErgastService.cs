@@ -19,15 +19,30 @@ namespace FormulaOneTech.Services.Ergast
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        public async Task<List<Driver>> GetDrivers(string year)
+        public async Task<List<Driver>> GetDrivers(string year = "current")
         {
             var response = await _httpClient.GetAsync($"{year}/drivers.json");
 
             var data = await response.Content.ReadAsStringAsync();
 
-            var drivers = JsonSerializer.Deserialize<List<Driver>>(data);
+            var results = JsonSerializer.Deserialize<ErgastRootModel>(data, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
-            return drivers;
+            var currentDrivers = results?.MRData?.DriverTable.Drivers
+                .Select(r => new Driver
+                {
+                    PermanentNumber = r.PermanentNumber,
+                    Code = r.Code,
+                    DateOfBirth = r.DateOfBirth,
+                    DriverId = r.DriverId,
+                    FamilyName = r.FamilyName,
+                    GivenName = r.GivenName,
+                    Nationality = r.Nationality
+                }).ToList();
+
+            return currentDrivers ?? new List<Driver>();
         }
 
         /// <summary>
