@@ -1,91 +1,77 @@
 ﻿@inject FormulaOneTech.Services.OpenF1.IOpenF1Service _openF1Service;
 @using Models.Ergast;
 @using Models.OpenF1;
-<div class="w-[550px] text-[#E4EDF5] bg-opacity-60 overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter">
+<div class="w-[550px] text-[#E4EDF5] bg-opacity-60 overflow-y-auto rounded-lg bg-gray-800 bg-clip-padding p-5 backdrop-blur-lg backdrop-filter"> 
     @if(isLoading)
     {
         <div>Loading...</div>
     }
     else
     {
-        <div class="flex justify-between">
-            <div class="mb-2 text-base font-bold">Team Radio</div>
-            <div>Select a driver
-                <select @onchange="OnSelectedDriver">
-                    @foreach(var driver in Driver)
+        <div class="flex items-center justify-between pb-4">
+            <div class="text-base font-bold">Team Radio</div>
+            <div class="">
+                <span class="text-sm font-medium">Select a driver</span>
+                <select @onchange="OnSelectedDriver" class="bg-[#0000005e] text-xs">
+                    <option value="">Select a driver</option>
+                    @foreach(var driver in DriverList)
                     {
-                        <option value="@driver.PermanentNumber">@driver.GivenName @driver.FamilyName</option>
+                        <option value="@driver.Driver.PermanentNumber">@driver.Driver.GivenName @driver.Driver.FamilyName</option>
                     }
                 </select>
             </div>
         </div>
         @if (loadedDriverAudio)
         {
-            <div class="flex flex-col gap-4">
-                @foreach(var audioClip in DriverAudio)
+            <div class="mb-2 text-xs font-semibold">
+                <span class="border-l-0 border-t-0 border-b-0 border-4 border-solid border-@DriverTeamId text-center" style="padding-right:6px">Listening to</span>
+                <span style="padding-left:6px;">@DriverFirstName</span> <span class="uppercase">@DriverFamilyName</span> <span>-</span> <span>@DriverTeam</span>
+            </div>
+            <div class="max-h-[300px] flex flex-col overflow-y-auto overflow-x-hidden" style="padding-right:10px;">
+                @foreach(var audioClip in DriverAudio.OrderByDescending(a => a.Date))
                 {
-                    <span>@audioClip.Date.Value.ToString("H:mm")</span>
-                    <audio controls src="@audioClip.RecordingUrl"></audio>
+                    <div class="bg-[#0000005e] mb-2 flex items-center justify-start rounded-lg p-2">
+                        <span class="p-2 text-sm font-semibold" style="min-width:15%">@audioClip.Date.Value.ToString("H:mm:ss")</span>
+                        <audio class="w-full" controls src="@audioClip.RecordingUrl"></audio>
+                    </div>
                 }
             </div>
         }
-
-        <div class="header-sign">
-            <div class="dropdown" id="toggleDropdown">
-                <button @onclick="Show" @onblur="Hide" class="button-md" type="button">
-                    <i data-feather="user"></i>
-                    <span>Personal cab</span>
-                </button>
-                <ul class="dropdown-list @(isActive ? "is-active" : "")">
-                    <li class="dropdown-item">
-                        <a class="dropdown-link" href="/cabinet">
-                            <p class="text-md">Cabinet</p>
-                        </a>
-                    </li>
-                    <li class="dropdown-item">
-                        <a @onclick="LogOutAsync" class="dropdown-link" href="">
-                            <p class="text-md">LogOut</p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
     }
     
 </div>
 
+<style>
+    select{
+        text-align: center;
+        padding: 5px;
+        border-radius: 8px;
+    }
+</style>
+
 @code {
+    // [Parameter]
+    // public List<Models.Ergast.Driver> Driver { get; set; } = new List<Models.Ergast.Driver>();
+
     [Parameter]
-    public List<Models.Ergast.Driver> Driver { get; set; } = new List<Models.Ergast.Driver>();
+    public List<Models.Ergast.DriverStandings> DriverList { get; set; } = new List<Models.Ergast.DriverStandings>();
 
     public List<Models.OpenF1.TeamRadio> DriverAudio { get; set; }
 
     private bool isLoading = true;
     private bool loadedDriverAudio = false;
+
+    private string DriverFirstName = string.Empty;
+    private string DriverFamilyName = string.Empty;
+    private string DriverTeam = string.Empty;
+    private string DriverTeamId = string.Empty;
     protected override async Task OnParametersSetAsync()
     {
-        if (Driver != null)
+        if (DriverList != null)
         {
             isLoading = false;
         }
         StateHasChanged();
-    }
-    private async Task LogOutAsync()
-    {
-
-    }
-
-    private bool isActive = false;
-
-    private void Show()
-    {
-        isActive = true;
-    }
-
-    private void Hide()
-    {
-        isActive = false;
     }
 
     private async Task OnSelectedDriver(ChangeEventArgs e)
@@ -95,6 +81,14 @@
         if(DriverAudio != null)
         {
             loadedDriverAudio = true;
+            if (DriverList != null)
+            {
+                DriverFirstName = DriverList?.FirstOrDefault(d => d.Driver?.PermanentNumber == driverNumber)?.Driver?.GivenName!;
+                DriverFamilyName = DriverList?.FirstOrDefault(d => d.Driver?.PermanentNumber == driverNumber)?.Driver?.FamilyName!;
+                DriverTeam = DriverList?.FirstOrDefault(d => d.Driver?.PermanentNumber == driverNumber)?.Constructors.FirstOrDefault()?.Name!;
+                DriverTeamId = DriverList?.FirstOrDefault(d => d.Driver?.PermanentNumber == driverNumber)?.Constructors.FirstOrDefault()?.ConstructorId!;
+            }
+
             StateHasChanged();
         }
     }

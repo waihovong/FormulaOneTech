@@ -102,6 +102,7 @@
                                     <th class="px-5 py-2 text-left">Q1</th>
                                     <th class="px-5 py-2 text-left">Q2</th>
                                     <th class="px-5 py-2 text-left">Q3</th>
+                                    <th class="px-5 py-2 text-left">Gap</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -126,6 +127,16 @@
                                         <td class="px-5 py-2 font-semibold @(quali.Q3 == fastestQ3 ? "text-fuchsia-500" : "")">
                                             @quali.Q3
                                         </td>
+                                        <td class="px-5 py-2 font-semibold @(quali.Q3 == fastestQ3 ? "text-fuchsia-500" : "")">
+                                            @if (@quali.Gap > 0)
+                                            {
+                                                  <span>+@quali.Gap</span>
+                                            }
+                                            else
+                                            {
+                                                @quali.Gap
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -134,6 +145,10 @@
                         <span class="flex items-center gap-2 pt-2 text-xs font-normal">
                             <div class="w-[5px] h-[5px] rounded-full bg-fuchsia-500"></div>
                             Indictor shows fastest driver of each qualification session
+                        </span>
+                        <span class="flex items-center text-xs font-normal">
+                            <div class="w-[5px] h-[5px] rounded-full bg-green-500"></div>
+                            Gap is calcuated based on the fastest qualifying time
                         </span>
                     }
                 </div>
@@ -182,8 +197,12 @@
     private string fastestQ1 = string.Empty;
     private string fastestQ2 = string.Empty;
     private string fastestQ3 = string.Empty;
+    private double CompareQualiGap = 0.0;
 
     public bool driverSelected = false;
+
+    List<QualifyingResults> driverQualiList = new List<QualifyingResults>();
+
 
     [Parameter]
     public EventCallback<DateTime?> PreviousRaceDate { get; set; }
@@ -228,6 +247,8 @@
     private async Task<RaceMapper.RaceDto> GetPreviousRaceQualiResults()
     {
         var qualiResults = await _ergastService.GetPreviousQualiResults(PreviousRaceResults.Season, PreviousRaceResults.Round);
+        QualifyingResults.CalculateGaps(qualiResults.QualifyingResults);
+
         List<string>? fastestQ1Driver = qualiResults?.QualifyingResults?.Select(d => d.Q1)?.ToList();
         List<string>? fastestQ2Driver = qualiResults?.QualifyingResults?.Select(d => d.Q2)?.ToList();
         List<string>? fastestQ3Driver = qualiResults?.QualifyingResults?.Select(d => d.Q3)?.ToList();

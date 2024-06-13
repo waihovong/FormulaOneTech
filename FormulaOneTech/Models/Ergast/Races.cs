@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Routing;
+﻿using FormulaOneTech.Helpers;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Server.Circuits;
+using System.ComponentModel.DataAnnotations;
 
 namespace FormulaOneTech.Models.Ergast
 {
@@ -73,6 +75,30 @@ namespace FormulaOneTech.Models.Ergast
         public string? Q1 { get; set; }
         public string? Q2 { get; set; }
         public string? Q3 { get; set; }
+        public double Gap { get; set; }
+        public static List<QualifyingResults> CalculateGaps(List<QualifyingResults> qualiList)
+        {
+            var qualiWinner = qualiList.FirstOrDefault(a => a.Position == "1")?.Q3;
+
+            foreach(var driverResult in qualiList)
+            {
+                double gap;
+                if (driverResult.Q2 == null && driverResult.Q3 == null)
+                {
+                    gap = Common.CalculateTimeDifference(driverResult.Q1, qualiWinner);
+                }
+                else if (driverResult.Q3 == null)
+                {
+                    gap = Common.CalculateTimeDifference(driverResult.Q2, qualiWinner);
+                }
+                else
+                {
+                    gap = Common.CalculateTimeDifference(driverResult.Q3, qualiWinner);
+                }
+                driverResult.Gap = gap;
+            }
+            return qualiList;
+        }
     }
 
     public class Lap
