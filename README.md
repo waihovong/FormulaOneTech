@@ -1,5 +1,5 @@
 ## Formula 1 Technical
-Formula 1 Technical is a dashboard that displays race results from the most recent formula race.
+Formula 1 Technical is a dashboard that displays race results from the most recent Formula 1 race.
 <br/>
 This project utilizes [Ergast Developer API](http://ergast.com/mrd/) and [OpenF1](https://openf1.org) for displaying data.
 
