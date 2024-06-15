@@ -27,6 +27,12 @@ namespace FormulaOneTech.Services.OpenF1
             }
             return query.ToString();
         }
+
+        /// <summary>
+        /// Gets the latest meeting key which is the id for a race
+        /// </summary>
+        /// <param name="additionalParams"></param>
+        /// <returns></returns>
         public async Task<List<Meeting>> GetLatestMeetingKey(Dictionary<string, string> additionalParams)
         {
             try
@@ -55,7 +61,12 @@ namespace FormulaOneTech.Services.OpenF1
             }
         }
 
-
+        /// <summary>
+        /// Gets the latest session key which is the id for the race weekend session
+        /// </summary>
+        /// <param name="additionalParams"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<List<Session>> GetSessionKey(Dictionary<string, string> additionalParams)
         {
             try
@@ -78,6 +89,13 @@ namespace FormulaOneTech.Services.OpenF1
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// Gets race control messages 
+        /// </summary>
+        /// <param name="additionalParams"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<List<RaceControl>> GetRaceControlData(Dictionary<string, string> additionalParams)
         {
             try
@@ -90,16 +108,20 @@ namespace FormulaOneTech.Services.OpenF1
                 var data = await response.Content.ReadAsStringAsync();
                 var raceControl = JsonSerializer.Deserialize<List<RaceControl>>(data);
 
-                return raceControl;
+                return raceControl.OrderByDescending(r => r.Date).ToList();
             }
             catch
             {
                 return new List<RaceControl>();
             }
-            //https://api.openf1.org/v1/race_control?date=2024-06-09
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Gets driver communication radio from pit wall
+        /// </summary>
+        /// <param name="additionalParams"></param>
+        /// <returns></returns>
         public async Task<List<TeamRadio>> GetDriverRadioAudio(Dictionary<string, string> additionalParams)
         {
             try
@@ -112,11 +134,36 @@ namespace FormulaOneTech.Services.OpenF1
                 var data = await response.Content.ReadAsStringAsync();
                 var driverAudio = JsonSerializer.Deserialize<List<TeamRadio>>(data);
 
-                return driverAudio;
+                return driverAudio.OrderByDescending(r => r.Date).ToList();
             }
             catch
             {
                 return new List<TeamRadio>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a drivers stints which is laps on a specific tyre compound
+        /// </summary>
+        /// <param name="additionalParams"></param>
+        /// <returns></returns>
+        public async Task<List<Stints>> GetDriverStints(Dictionary<string, string> additionalParams)
+        {
+            try
+            {
+                var queryString = BuildQueryString(additionalParams);
+                var uribuilder = new UriBuilder(_httpClient.BaseAddress + "stints")
+                { Query = queryString };
+
+                var response = await _httpClient.GetAsync(uribuilder.ToString());
+                var data = await response.Content.ReadAsStringAsync();
+                var driverStints = JsonSerializer.Deserialize<List<Stints>>(data);
+
+                return driverStints;
+            }
+            catch
+            {
+                return new List<Stints>();
             }
         }
     }

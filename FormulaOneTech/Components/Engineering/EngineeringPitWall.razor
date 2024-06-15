@@ -11,9 +11,9 @@
     {
         <div class="mb-2 flex justify-between">
             <div class="mb-2 text-base font-bold">Race Control</div>
-            <div class="flex items-center gap-2 text-xs">
-                <span>Sort By: </span>
-                <button class="bg-[#0000005e] rounded-lg p-2" @onclick="(()=>RaceControlSortByButton())">Most Recent</button>
+            <div class="flex items-center gap-2 text-xs font-semibold">
+                <span class="">Sort By: </span>
+                <button class="bg-[#0000005e] rounded-lg p-2 hover:bg-neutral-500" @onclick="(()=>RaceControlSortByButton())">@SortByButtonText</button>
             </div>
         </div>
         <div class="max-h-[300px] overflow-y-auto overflow-x-hidden">
@@ -49,10 +49,8 @@
     private int SliderValue { get; set; }
     private List<RaceControl> FilteredRaceControlData { get; set; } = new List<RaceControl>();
 
-    public IEnumerable<dynamic> Categories { get; set; }
-
     public bool IsSortedMostRecent { get; set; } = true;
-    public string SortByButtonText = "Most Recent";
+    public string SortByButtonText = "Oldest";
 
     public Dictionary<string, string> FlagStyle { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
@@ -75,7 +73,11 @@
     private void RaceControlSortByButton()
     {
         IsSortedMostRecent = !IsSortedMostRecent;
-        SortByButtonText = IsSortedMostRecent ? "Newest" : "Oldest";
+        SortByButtonText = IsSortedMostRecent ? "Oldest" : "Newest";
+        RaceControls = IsSortedMostRecent ?
+            RaceControls.OrderByDescending(x => x.Date).ToList() :
+            RaceControls.OrderBy(x => x.Date).ToList();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
@@ -95,7 +97,6 @@
         if (RaceDate.HasValue)
         {
             RaceControls = await _openF1Service.GetRaceControlData(raceControl);
-            Categories = RaceControls.FindAll(x => x.Category != null).DistinctBy(x => x.Category).ToList();
         }
 
         if (MeetingKey != null)
@@ -103,17 +104,4 @@
             isLoading = false;
         }
     }
-
-    // private void OnSliderValueChanged(int value)
-    // {
-    //     SliderValue = value;
-    //     FilteredRaceControlDataMessages();
-    // }
-
-    // private void FilteredRaceControlDataMessages()
-    // {
-    //     FilteredRaceControlData = RaceControls
-    //         .Where(x => x.LapNumber == SliderValue)
-    //         .ToList();
-    // }
 }

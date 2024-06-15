@@ -1,0 +1,99 @@
+﻿@inject FormulaOneTech.Services.OpenF1.IOpenF1Service _openF1Service;
+@inject FormulaOneTech.Services.Ergast.IErgastService _ergastService;
+@using Models.OpenF1;
+@using Models.Ergast;
+@using Models.Data;
+
+@if (isLoading)
+{
+    <div>Loading...</div>
+}
+else
+{
+    <FormulaOneTech.Components.Data.TypeStrategyChart DriverList="DriverRaceStints" />
+}
+
+@code {
+    [Parameter]
+    public List<Models.Ergast.DriverStandings> DriverList { get; set; } = new List<DriverStandings>();
+
+    public List<Models.Data.DriverRaceStint> DriverRaceStints { get; set; } = new List<Models.Data.DriverRaceStint>();
+
+    public bool isLoading = true;
+    //need to find driver number with name somehow
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        DriverRaceStints = await GetDriverStintsData(); //call new mapper
+        if (DriverRaceStints != null)
+        {
+            isLoading = false;
+        }
+        StateHasChanged();
+    }
+
+    private async Task<List<Models.Data.DriverRaceStint>> GetDriverStintsData()
+    {
+        var raceData = new List<Models.Data.DriverRaceStint>();
+        var latestSession = new Dictionary<string, string>
+        {
+            {"session_key", "latest"}
+        };
+        var data = await _openF1Service.GetDriverStints(latestSession);
+        List<Models.OpenF1.Stints> filteredData = data.Where(r => r.DriverNumber != null && r.Compound != null).ToList();
+        var driverData = await GetDriverData();
+
+        foreach (var driver in filteredData)
+        {
+            driver.DriverFamilyName = DriverList.Where(d => d?.Driver?.PermanentNumber == driver?.DriverNumber?.ToString()).FirstOrDefault()?.Driver.FamilyName;
+            driver.DriverPosition = driverData?.Results?.Where(r => r?.Driver?.PermanentNumber == driver?.DriverNumber?.ToString()).FirstOrDefault()?.Position != null ?
+                                int.Parse(driverData.Results.Where(r => r.Driver.PermanentNumber == driver.DriverNumber.ToString()).FirstOrDefault().Position) : 0;
+
+            //This is error prone because if winner of wdc isn't Max33 then it will show the wrong driver.
+            //Need to find a suitable mapping that will combine data from both sources and return correct result
+            if (DriverList.Any(d => d?.Driver.PermanentNumber == "33" && driver?.DriverNumber.HasValue == true && driver?.DriverNumber == 1))
+            {
+                driver.DriverFamilyName = DriverList.FirstOrDefault()?.Driver.FamilyName;
+                driver.DriverPosition = int.Parse(driverData.Results.FirstOrDefault().Position);
+            }
+        }
+
+        var groupedDriver = filteredData
+        .Where(r => r.DriverNumber != 0 && !string.IsNullOrEmpty(r.Compound))
+        .GroupBy(r => new { r.DriverFamilyName, r.DriverNumber, r.DriverPosition }).OrderBy(r => r.Key.DriverPosition)
+        .ToList();
+
+        foreach(var driverStint in groupedDriver)
+        {
+            var driverRaceStint = new DriverRaceStint
+            {
+                Driver = new Driver
+                {
+                    FamilyName = driverStint.Key.DriverFamilyName,
+                    DriverNumber = driverStint.Key.DriverNumber.ToString()
+                },
+                Stints = driverStint.Select(r => new Models.OpenF1.Stints
+                {
+                    DriverFamilyName = driverStint.Key.DriverFamilyName,
+                    DriverNumber = driverStint.Key.DriverNumber,
+                    StintNumber = r.StintNumber,
+                    Compound = r.Compound,
+                    LapStart = r.LapStart,
+                    LapEnd = r.LapEnd,
+                    DriverPosition = r.DriverPosition,
+                    TyreAgeAtStart = r.TyreAgeAtStart
+                }).ToList()
+            };
+            raceData.Add(driverRaceStint);
+        }
+
+        return raceData;
+    }
+
+    private async Task<RaceMapper.RaceDto> GetDriverData()
+    {
+        var previousRaceResults = await _ergastService.GetPreviousRaceResults();
+        return previousRaceResults;
+    }
+}

@@ -1,0 +1,163 @@
+﻿@using Models.OpenF1;
+@using Models.Ergast;
+@using Plotly.Blazor;
+@using Plotly.Blazor.Traces;
+@using Plotly.Blazor.LayoutLib;
+
+<PlotlyChart style="height: 60vh; min-height: 350px" @bind-Config="config" @bind-Layout="layout" Data="graph_data" @ref="chart" />
+@code {
+    [Parameter]
+    public List<Models.Data.DriverRaceStint> DriverList { get; set; } = new List<Models.Data.DriverRaceStint>();
+
+    PlotlyChart chart;
+    private IList<ITrace> graph_data;
+    private Layout layout;
+    HashSet<string> processedDrivers = new HashSet<string>();
+    private int MaxLap = 1;
+    Config config = new Config()
+        {
+            Responsive = true,
+            ShowAxisDragHandles = false,
+            AutoSizable = true,
+            ToImageButtonOptions = false,
+            Editable = false,
+            ShowSendToCloud = false,
+            DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False
+        };
+
+    protected override void OnInitialized()
+    {
+        graph_data = new List<ITrace>();
+        base.OnInitialized();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string previousCompound = null;
+        double opacity = 0.6;
+        if (DriverList != null)
+        {
+            foreach (var driverRaceStint in DriverList)
+            {
+                var driverName = driverRaceStint.Driver.FamilyName;
+                if (!processedDrivers.Contains(driverName))
+                {
+                    foreach (var stint in driverRaceStint.Stints.OrderBy(r => r.DriverPosition))
+                    {
+                        var pattern = new Plotly.Blazor.Traces.BarLib.MarkerLib.Pattern
+                            {
+                                Shape = Plotly.Blazor.Traces.BarLib.MarkerLib.PatternLib.ShapeEnum.Slash,
+                            };
+                        var laps = Enumerable.Range(stint.LapStart.Value, stint.LapEnd.Value - stint.LapStart.Value + 1).Cast<object>().ToList();
+
+                        double currentOpacity = opacity;
+                        if (stint.Compound == previousCompound)
+                        {
+                            currentOpacity = 0.2;
+                        }
+                        var trace = new Bar
+                            {
+                                X = laps,
+                                Y = Enumerable.Repeat(driverName, laps.Count).Cast<object>().ToList(),
+                                Orientation = Plotly.Blazor.Traces.BarLib.OrientationEnum.H,
+                                Name = $"{stint.Compound}",
+                                Marker = new Plotly.Blazor.Traces.BarLib.Marker
+                                {
+                                    Color = GetColorForCompound(stint.Compound.ToLower(), opacity),
+                                    Pattern = stint.StintNumber % 2 == 1 ? new Plotly.Blazor.Traces.BarLib.MarkerLib.Pattern
+                                    {
+                                        Shape = Plotly.Blazor.Traces.BarLib.MarkerLib.PatternLib.ShapeEnum.VerticalBar
+                                    } : new Plotly.Blazor.Traces.BarLib.MarkerLib.Pattern
+                                    {
+                                        Shape = Plotly.Blazor.Traces.BarLib.MarkerLib.PatternLib.ShapeEnum.Empty
+                                    }, // Use cross pattern for odd stint numbers, circle pattern for even numbers
+                                    Line = new Plotly.Blazor.Traces.BarLib.MarkerLib.Line
+                                    {
+                                        Color = stint.StintNumber % 2 == 0 ? "black" : "transparent",
+                                    },
+                                },
+                            };
+                        graph_data.Add(trace);
+                        previousCompound = stint.Compound;
+                    }
+
+                    processedDrivers.Add(driverName);
+                }
+            }
+            if (chart != null)
+            {
+                // await chart.LayoutChanged.InvokeAsync(layout);
+                await InvokeAsync(() => chart.Update());
+            }
+
+            if (chart != null)
+            {
+                var dataCopy = new List<ITrace>(graph_data);
+                await InvokeAsync(() => chart.Clear());
+                int LapCount = DriverList.SelectMany(r => r.Stints).Max(stint => stint.LapEnd.Value);
+                MaxLap = LapCount;
+                var orderDriver = DriverList.SelectMany(driver => driver.Stints)
+                               .OrderByDescending(stint => stint.DriverPosition)
+                               .Select(stint => stint.DriverFamilyName)
+                               .Distinct()
+                               .ToArray();
+
+                layout = new Layout
+                    {
+                        Title = new Title
+                        {
+                            Text = "Driver Tyre Strategy",
+                            Font = new Plotly.Blazor.LayoutLib.TitleLib.Font
+                            {
+                                Color = "rgb(255, 255, 255)"
+                            }
+                        },
+                        BarMode = BarModeEnum.Stack,
+                        PaperBgColor = "rgb(48, 48, 48)",
+                        PlotBgColor = "rgb(48, 48, 48)",
+                        ShowLegend = false,
+                        YAxis = new List<YAxis>
+            {
+                new YAxis
+                {
+                    CategoryArray = orderDriver,
+                    Color = "rgb(255, 255, 255)"
+                }
+            },
+                        XAxis = new List<XAxis>
+            {
+                new XAxis
+                {
+                    Color = "rgb(255, 255, 255)",
+                    Range = new List<object> { 0, MaxLap + 1},
+                }
+            },
+                    };
+
+                foreach (var trace in dataCopy)
+                {
+                    chart.AddTrace(trace);
+                }
+
+                await InvokeAsync(() => chart.Update());
+            }
+        }
+        await base.OnParametersSetAsync();
+    }
+
+    private string GetColorForCompound(string compound, double opacity)
+    {
+        // Adjust the color based on the opacity
+        return compound switch
+        {
+            "hard" => $"rgba(255, 255, 255, {opacity})",
+            "soft" => $"rgba(255, 0, 0, {opacity})",
+            "medium" => $"rgba(255, 255, 0, {opacity})",
+            "wet" => $"rgba(0, 0, 255, {opacity})",
+            "intermediate" => $"rgba(0, 255, 0, {opacity})",
+            _ => $"rgba(128, 128, 128, {opacity})" // Default to gray with specified opacity
+        };
+    }
+
+
+}

@@ -8,5 +8,6 @@ namespace FormulaOneTech.Services.OpenF1
         Task<List<Session>> GetSessionKey(Dictionary<string, string> additionalParams);
         Task<List<RaceControl>> GetRaceControlData(Dictionary<string, string> additionalParams);
         Task<List<TeamRadio>> GetDriverRadioAudio(Dictionary<string, string> additionalParams);
+        Task<List<Stints>> GetDriverStints(Dictionary<string, string> additionalParams);
     }
 }

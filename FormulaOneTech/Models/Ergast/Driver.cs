@@ -9,5 +9,6 @@
         public string FamilyName { get; set; }
         public string DateOfBirth { get; set; }
         public string Nationality { get; set; }
+        public string DriverNumber { get; set; }
     }
 }
