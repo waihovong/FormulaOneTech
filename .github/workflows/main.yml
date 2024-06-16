@@ -22,8 +22,8 @@ jobs:
           run: dotnet publish ./Web/Web.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
         - name: Change base-tag in index.html from / to FormulaOneTech
           run: sed -i 's/<base href="\/" \/>/<base href="\/FormulaOneTech\/" \/>/g' release/wwwroot/index.html
-        - name: Create .nojekyll file
-          run: echo "" > build_output/wwwroot/.nojekyll
+        - name: Add .nojekyll file
+          run: touch release/wwwroot/.nojekyll
         - name: Commit wwwroot to GitHub Pages
           uses: peaceiris/actions-gh-pages@v4
           with:
