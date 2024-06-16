@@ -28,11 +28,11 @@ jobs:
         - name: Change base-tag in index.html from / to FormulaOneTech
           run: sed -i 's/<base href="\/" \/>/<base href="\/FormulaOneTech\/" \/>/g' ./dist/Web/wwwroot/index.html
           
-        - name: copy index.html to 404.html
-          run: cp ./dist/Web/wwwroot/index.html ./dist/Web/wwwroot/404.html
+        # - name: copy index.html to 404.html
+        #   run: cp ./dist/Web/wwwroot/index.html ./dist/Web/wwwroot/404.html
           
-        - name: Add .nojekyll file
-          run: touch ./dist/Web/wwwroot/.nojekyll
+        # - name: Add .nojekyll file
+        #   run: touch ./dist/Web/wwwroot/.nojekyll
           
         - name: Commit wwwroot to GitHub Pages
           uses: peaceiris/actions-gh-pages@v4
