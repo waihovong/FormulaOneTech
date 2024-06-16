@@ -21,14 +21,19 @@ jobs:
             dotnet-version: 8.0.x
         - name: Install .NET WASM Build Tools
           run: dotnet workload install wasm-tools
+          
         - name: Publish .NET Core Project
           run: dotnet publish ./FormulaOneTech/FormulaOneTech.csproj -c:Release -p:GHPages=true -o dist/Web --nologo
-        # - name: Check where index is
-        #   run: ls -R ./dist/Web
+          
         - name: Change base-tag in index.html from / to FormulaOneTech
           run: sed -i 's/<base href="\/" \/>/<base href="\/FormulaOneTech\/" \/>/g' ./dist/Web/wwwroot/index.html
+          
+        - name: copy index.html to 404.html
+          run: cp ./dist/Web/wwwroot/index.html ./dist/Web/wwwroot/404.html
+          
         - name: Add .nojekyll file
           run: touch ./dist/Web/wwwroot/.nojekyll
+          
         - name: Commit wwwroot to GitHub Pages
           uses: peaceiris/actions-gh-pages@v4
           with:
